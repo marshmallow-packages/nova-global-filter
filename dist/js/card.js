@@ -84,7 +84,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     },
     resetFilters: function resetFilters() {
       this.filters = [];
-      Nova.$emit("global-filter-response", this.filters);
+      Nova.$emit("filter-reset", this.filters);
     }
   }
 });
@@ -119,6 +119,57 @@ __webpack_require__.r(__webpack_exports__);
       (0,_util__WEBPACK_IMPORTED_MODULE_2__.minimum)(Nova.request().get(this.metricEndpoint, this.filterPayload())).then(function (_ref) {
         var value = _ref.data.value.value;
         _this.chartData = value;
+        _this.loading = false;
+      });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/util */ "./vendor/laravel/nova/resources/js/util/index.js");
+/* harmony import */ var _FilterBehavior__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FilterBehavior */ "./resources/js/components/FilterBehavior.js");
+/* harmony import */ var _components_Metrics_ProgressMetric__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/Metrics/ProgressMetric */ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue");
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  "extends": _components_Metrics_ProgressMetric__WEBPACK_IMPORTED_MODULE_2__["default"],
+  mixins: [_FilterBehavior__WEBPACK_IMPORTED_MODULE_1__["default"]],
+  methods: {
+    fetch: function fetch() {
+      var _this = this;
+
+      this.loading = true;
+      (0,_util__WEBPACK_IMPORTED_MODULE_0__.minimum)(Nova.request().get(this.metricEndpoint, this.filterPayload())).then(function (_ref) {
+        var _ref$data$value = _ref.data.value,
+            value = _ref$data$value.value,
+            target = _ref$data$value.target,
+            percentage = _ref$data$value.percentage,
+            prefix = _ref$data$value.prefix,
+            suffix = _ref$data$value.suffix,
+            suffixInflection = _ref$data$value.suffixInflection,
+            format = _ref$data$value.format,
+            avoid = _ref$data$value.avoid;
+        _this.value = value;
+        _this.target = target;
+        _this.percentage = percentage;
+        _this.format = format || _this.format;
+        _this.avoid = avoid;
+        _this.prefix = prefix || _this.prefix;
+        _this.suffix = suffix || _this.suffix;
+        _this.suffixInflection = suffixInflection;
         _this.loading = false;
       });
     }
@@ -327,6 +378,135 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return payload;
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/util */ "./vendor/laravel/nova/resources/js/util/index.js");
+/* harmony import */ var _mixins__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/mixins */ "./vendor/laravel/nova/resources/js/mixins/index.js");
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'ProgressMetric',
+  mixins: [_mixins__WEBPACK_IMPORTED_MODULE_1__.InteractsWithDates, _mixins__WEBPACK_IMPORTED_MODULE_1__.MetricBehavior],
+  props: {
+    card: {
+      type: Object,
+      required: true
+    },
+    resourceName: {
+      type: String,
+      "default": ''
+    },
+    resourceId: {
+      type: [Number, String],
+      "default": ''
+    },
+    lens: {
+      type: String,
+      "default": ''
+    }
+  },
+  data: function data() {
+    return {
+      loading: true,
+      format: '(0[.]00a)',
+      avoid: false,
+      prefix: '',
+      suffix: '',
+      suffixInflection: true,
+      value: 0,
+      target: 0,
+      percentage: 0,
+      zeroResult: false
+    };
+  },
+  watch: {
+    resourceId: function resourceId() {
+      this.fetch();
+    }
+  },
+  created: function created() {
+    if (this.hasRanges) {
+      this.selectedRangeKey = this.card.selectedRangeKey || this.card.ranges[0].value;
+    }
+
+    this.fetch();
+  },
+  mounted: function mounted() {
+    if (this.card && this.card.refreshWhenFiltersChange === true) {
+      Nova.$on('filter-changed', this.fetch);
+    }
+  },
+  beforeUnmount: function beforeUnmount() {
+    if (this.card && this.card.refreshWhenFiltersChange === true) {
+      Nova.$off('filter-changed', this.fetch);
+    }
+  },
+  methods: {
+    fetch: function fetch() {
+      var _this = this;
+
+      this.loading = true;
+      (0,_util__WEBPACK_IMPORTED_MODULE_0__.minimum)(Nova.request().get(this.metricEndpoint, this.metricPayload)).then(function (_ref) {
+        var _ref$data$value = _ref.data.value,
+            value = _ref$data$value.value,
+            target = _ref$data$value.target,
+            percentage = _ref$data$value.percentage,
+            prefix = _ref$data$value.prefix,
+            suffix = _ref$data$value.suffix,
+            suffixInflection = _ref$data$value.suffixInflection,
+            format = _ref$data$value.format,
+            avoid = _ref$data$value.avoid;
+        _this.value = value;
+        _this.target = target;
+        _this.percentage = percentage;
+        _this.format = format || _this.format;
+        _this.avoid = avoid;
+        _this.prefix = prefix || _this.prefix;
+        _this.suffix = suffix || _this.suffix;
+        _this.suffixInflection = suffixInflection;
+        _this.loading = false;
+      });
+    }
+  },
+  computed: {
+    metricPayload: function metricPayload() {
+      var payload = {
+        params: {
+          timezone: this.userTimezone
+        }
+      };
+
+      if (!Nova.missingResource(this.resourceName) && this.card && this.card.refreshWhenFiltersChange === true) {
+        payload.params.filter = this.$store.getters["".concat(this.resourceName, "/currentEncodedFilters")];
+      }
+
+      return payload;
+    },
+    metricEndpoint: function metricEndpoint() {
+      var lens = this.lens !== '' ? "/lens/".concat(this.lens) : '';
+
+      if (this.resourceName && this.resourceId) {
+        return "/nova-api/".concat(this.resourceName).concat(lens, "/").concat(this.resourceId, "/metrics/").concat(this.card.uriKey);
+      } else if (this.resourceName) {
+        return "/nova-api/".concat(this.resourceName).concat(lens, "/metrics/").concat(this.card.uriKey);
+      } else {
+        return "/nova-api/metrics/".concat(this.card.uriKey);
+      }
     }
   }
 });
@@ -812,6 +992,43 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , ["title", "help-text", "help-width", "chart-data", "loading"]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "vue");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_BaseProgressMetric = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("BaseProgressMetric");
+
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_BaseProgressMetric, {
+    title: $props.card.name,
+    "help-text": $props.card.helpText,
+    "help-width": $props.card.helpWidth,
+    target: _ctx.target,
+    value: _ctx.value,
+    percentage: _ctx.percentage,
+    prefix: _ctx.prefix,
+    suffix: _ctx.suffix,
+    "suffix-inflection": _ctx.suffixInflection,
+    format: _ctx.format,
+    avoid: _ctx.avoid,
+    loading: _ctx.loading
+  }, null, 8
+  /* PROPS */
+  , ["title", "help-text", "help-width", "target", "value", "percentage", "prefix", "suffix", "suffix-inflection", "format", "avoid", "loading"]);
 }
 
 /***/ }),
@@ -21736,6 +21953,32 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/ProgressMetric.vue":
+/*!****************************************************!*\
+  !*** ./resources/js/components/ProgressMetric.vue ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProgressMetric.vue?vue&type=script&lang=js */ "./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js");
+/* harmony import */ var _Users_ltkort_Sites_Packages_marshmallow_nova_global_filter_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_Users_ltkort_Sites_Packages_marshmallow_nova_global_filter_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_1__["default"])(_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"], [['__file',"resources/js/components/ProgressMetric.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/TrendMetric.vue":
 /*!*************************************************!*\
   !*** ./resources/js/components/TrendMetric.vue ***!
@@ -21808,6 +22051,34 @@ __webpack_require__.r(__webpack_exports__);
 
 ;
 const __exports__ = /*#__PURE__*/(0,_Users_ltkort_Sites_Packages_marshmallow_nova_global_filter_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_PartitionMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_PartitionMetric_vue_vue_type_template_id_483f434d__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"vendor/laravel/nova/resources/js/components/Metrics/PartitionMetric.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue":
+/*!********************************************************************************!*\
+  !*** ./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ProgressMetric_vue_vue_type_template_id_530d830c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProgressMetric.vue?vue&type=template&id=530d830c */ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c");
+/* harmony import */ var _ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ProgressMetric.vue?vue&type=script&lang=js */ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js");
+/* harmony import */ var _Users_ltkort_Sites_Packages_marshmallow_nova_global_filter_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_Users_ltkort_Sites_Packages_marshmallow_nova_global_filter_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_ProgressMetric_vue_vue_type_template_id_530d830c__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -21904,6 +22175,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js":
+/*!****************************************************************************!*\
+  !*** ./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./ProgressMetric.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressMetric.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/TrendMetric.vue?vue&type=script&lang=js":
 /*!*************************************************************************!*\
   !*** ./resources/js/components/TrendMetric.vue?vue&type=script&lang=js ***!
@@ -21948,6 +22235,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PartitionMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PartitionMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PartitionMetric.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/PartitionMetric.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************!*\
+  !*** ./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./ProgressMetric.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=script&lang=js");
  
 
 /***/ }),
@@ -22012,6 +22315,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PartitionMetric_vue_vue_type_template_id_483f434d__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PartitionMetric_vue_vue_type_template_id_483f434d__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PartitionMetric.vue?vue&type=template&id=483f434d */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/PartitionMetric.vue?vue&type=template&id=483f434d");
+
+
+/***/ }),
+
+/***/ "./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c":
+/*!**************************************************************************************************************!*\
+  !*** ./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c ***!
+  \**************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_template_id_530d830c__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ProgressMetric_vue_vue_type_template_id_530d830c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./ProgressMetric.vue?vue&type=template&id=530d830c */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./vendor/laravel/nova/resources/js/components/Metrics/ProgressMetric.vue?vue&type=template&id=530d830c");
 
 
 /***/ }),
@@ -37278,6 +37597,7 @@ Nova.booting(function (app, router, store) {
   app.component("partition-metric", (__webpack_require__(/*! ./components/PartitionMetric */ "./resources/js/components/PartitionMetric.vue")["default"]));
   app.component("trend-metric", (__webpack_require__(/*! ./components/TrendMetric */ "./resources/js/components/TrendMetric.vue")["default"]));
   app.component("value-metric", (__webpack_require__(/*! ./components/ValueMetric */ "./resources/js/components/ValueMetric.vue")["default"]));
+  app.component("progress-metric", (__webpack_require__(/*! ./components/ProgressMetric */ "./resources/js/components/ProgressMetric.vue")["default"]));
   app.component("nova-global-filter", (__webpack_require__(/*! ./components/GlobalFilter */ "./resources/js/components/GlobalFilter.vue")["default"]));
 });
 })();
