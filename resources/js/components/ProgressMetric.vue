@@ -1,11 +1,12 @@
 <script>
-    import ValueMetric from "@/components/Metrics/ValueMetric";
-    import FilterBehavior from "./FilterBehavior";
     import { minimum } from "@/util";
+    import FilterBehavior from "./FilterBehavior";
+    import ProgressMetric from "@/components/Metrics/ProgressMetric";
 
     export default {
-        extends: ValueMetric,
+        extends: ProgressMetric,
         mixins: [FilterBehavior],
+
         methods: {
             fetch() {
                 this.loading = true;
@@ -20,22 +21,24 @@
                         data: {
                             value: {
                                 value,
-                                previous,
+                                target,
+                                percentage,
                                 prefix,
                                 suffix,
                                 suffixInflection,
                                 format,
-                                zeroResult,
+                                avoid,
                             },
                         },
                     }) => {
                         this.value = value;
+                        this.target = target;
+                        this.percentage = percentage;
                         this.format = format || this.format;
+                        this.avoid = avoid;
                         this.prefix = prefix || this.prefix;
                         this.suffix = suffix || this.suffix;
                         this.suffixInflection = suffixInflection;
-                        this.zeroResult = zeroResult || this.zeroResult;
-                        this.previous = previous;
                         this.loading = false;
                     }
                 );

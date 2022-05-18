@@ -3,13 +3,12 @@
 namespace Nemrutco\NovaGlobalFilter;
 
 use Illuminate\Database\Eloquent\Builder;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait GlobalFilterable
 {
-    public function globalFiltered($model, $filters = [])
+    public function globalFiltered(NovaRequest $request, $model, $filters = [])
     {
-        $request = request();
-
         $model = $model instanceof Builder ? $model : (new $model)->newQuery();
 
         if ($request->has('filters')) {
@@ -23,11 +22,11 @@ trait GlobalFilterable
 
                 $model = (new $filter)->apply($request, $model, $value);
             }
-        }else {
+        } else {
             foreach ($filters as $filter) {
                 $currentFilter = new $filter;
-                
-                if(!empty($currentFilter->default())) {
+
+                if (!empty($currentFilter->default())) {
                     $model = $currentFilter->apply($request, $model, $currentFilter->default());
                 }
             }
