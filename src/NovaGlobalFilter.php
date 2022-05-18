@@ -17,7 +17,7 @@ class NovaGlobalFilter extends Card
 
     public $resettable = false;
 
-    public $width = '5/6';
+    public $width = 'full';
 
     /**
      * Get the component name for the element.
@@ -35,7 +35,7 @@ class NovaGlobalFilter extends Card
         $this->filters = $filters;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [
             'filters' => collect($this->filters ?? [])->map(function ($filter) {
@@ -43,7 +43,14 @@ class NovaGlobalFilter extends Card
             })->values()->all(),
             'inline' => $this->inline,
             'resettable' => $this->resettable,
+            'width' => $this->width,
         ]);
+    }
+
+    public function width($width = "full")
+    {
+        $this->width = $width;
+        return $this;
     }
 
     public function inline()
