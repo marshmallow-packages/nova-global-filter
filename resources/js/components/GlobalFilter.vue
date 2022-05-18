@@ -153,7 +153,7 @@
             },
             resetFilters() {
                 this.filters = [];
-                Nova.$emit("global-filter-response", this.filters);
+                Nova.$emit("filter-reset", this.filters);
             },
         },
     };
