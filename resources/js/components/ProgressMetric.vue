@@ -1,10 +1,12 @@
 <script>
-    import TrendMetric from "@/components/Metrics/TrendMetric";
-    import FilterBehavior from "./FilterBehavior";
     import { minimum } from "@/util";
+    import FilterBehavior from "./FilterBehavior";
+    import ProgressMetric from "@/components/Metrics/ProgressMetric";
+
     export default {
-        extends: TrendMetric,
+        extends: ProgressMetric,
         mixins: [FilterBehavior],
+
         methods: {
             fetch() {
                 this.loading = true;
@@ -18,30 +20,22 @@
                     ({
                         data: {
                             value: {
-                                labels,
-                                trend,
                                 value,
+                                target,
+                                percentage,
                                 prefix,
                                 suffix,
                                 suffixInflection,
                                 format,
+                                avoid,
                             },
                         },
                     }) => {
                         this.value = value;
-                        this.labels = Object.keys(trend);
-                        this.data = {
-                            labels: Object.keys(trend),
-                            series: [
-                                _.map(trend, (value, label) => {
-                                    return {
-                                        meta: label,
-                                        value: value,
-                                    };
-                                }),
-                            ],
-                        };
+                        this.target = target;
+                        this.percentage = percentage;
                         this.format = format || this.format;
+                        this.avoid = avoid;
                         this.prefix = prefix || this.prefix;
                         this.suffix = suffix || this.suffix;
                         this.suffixInflection = suffixInflection;
