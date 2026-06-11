@@ -1,6 +1,11 @@
+![alt text](https://marshmallow.dev/cdn/media/logo-red-237x46.png "marshmallow.")
+
 # Nova Global Filter
 
-This package allows you to emit any of your existing Laravel Nova filters to metrics or custom cards.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/marshmallow/nova-global-filter.svg?style=flat-square)](https://packagist.org/packages/marshmallow/nova-global-filter)
+[![Total Downloads](https://img.shields.io/packagist/dt/marshmallow/nova-global-filter.svg?style=flat-square)](https://packagist.org/packages/marshmallow/nova-global-filter)
+
+This package allows you to broadcast any of your existing Laravel Nova filters to metrics or custom cards.
 
 ![screenshot](resources/gifs/nova-global-filter.gif)
 
@@ -9,15 +14,17 @@ This package allows you to emit any of your existing Laravel Nova filters to met
 
 ## Installation
 
-You can install the package in to a `Laravel` app that uses [Nova](https://nova.laravel.com) via composer:
+You can install the package into a `Laravel` app that uses [Nova](https://nova.laravel.com) via composer:
 
 ```bash
 composer require marshmallow/nova-global-filter
 ```
 
+The card is registered automatically through Laravel package auto-discovery, so there are no extra setup steps.
+
 ## Usage
 
-In this example, we are registering few `Metric Cards` and the `Global Filter` with a `Date` filter as:
+In this example, we are registering a few `Metric Cards` and the `Global Filter` with a `Date` filter as:
 
 ```php
 ...
@@ -30,7 +37,7 @@ class Store extends Resource
   public function cards(Request $request)
   {
     return [
-      new TotalSales // Value Metric
+      new TotalSales, // Value Metric
 
       new Orders, // Trend Metric
 
@@ -46,9 +53,9 @@ class Store extends Resource
 }
 ```
 
-And now `metric cards` or any `other cards` optimized to listen `GlobalFilter` can be filtered by using `GlobalFilterable` trait and calling `$this->globalFiltered($model,$filters)` method.
+And now `metric cards` or any `other cards` optimized to listen to `GlobalFilter` can be filtered by using the `GlobalFilterable` trait and calling the `$this->globalFiltered($request, $model, $filters)` method.
 
-`globalFiltered($model, $filters = [])` method expect `$model` and `$filters` parameters:
+The `globalFiltered($request, $model, $filters = [])` method expects the `$request`, `$model` and `$filters` parameters:
 
 ```php
 use Marshmallow\NovaGlobalFilter\GlobalFilterable;
@@ -57,27 +64,26 @@ use App\Nova\Filters\Date;
 
 class UsersPerDay extends Trend
 {
-use GlobalFilterable;
+  use GlobalFilterable;
 
   public function calculate(NovaRequest $request)
   {
     // Filter your model with existing filters
-    $model = $this->globalFiltered(Store::class,[
+    $model = $this->globalFiltered($request, Store::class, [
       Date::class // DateFilter
     ]);
 
     // Do your thing with the filtered $model
     return $this->countByDays($request, $model);
-
   }
 ...
 }
 ```
 
-And that's it. Cards will be filtered based on passed filter value.
+And that's it. Cards will be filtered based on the passed filter value.
 
 
-If you want to apply default value on initial request make sure you set default value in your filter as
+If you want to apply a default value on the initial request, make sure you set the default value in your filter as:
 
 ```php
 ...
@@ -89,7 +95,7 @@ public function default()
 ...
 ```
 
-To change layout from `grid` to `inline`
+To change the layout from `grid` to `inline`
 
 *by default it's set to `grid`*
 
@@ -97,35 +103,48 @@ To change layout from `grid` to `inline`
 
 ```php
 ...
-new NovaGlobalFilter([
+(new NovaGlobalFilter([
     // Filters
-])->inline(),
+]))->inline(),
 ...
 ```
 
-To enable `Reset` button
+To enable the `Reset` button:
+
 ```php
 ...
-new NovaGlobalFilter([
+(new NovaGlobalFilter([
     // Filters
-])->resettable(),
+]))->resettable(),
 ...
 ```
 
-To add multiple `Global Filter`s
+To add multiple `Global Filter`s:
+
 ```php
 ...
-new NovaGlobalFilter([
+(new NovaGlobalFilter([
     // Filters
-])->inline()->resettable(),
+]))->inline()->resettable(),
 
-new NovaGlobalFilter([
+(new NovaGlobalFilter([
     // Filters
-])->onlyOnDetail(),
+]))->onlyOnDetail(),
 ...
 ```
 
-To listen `Global Filter` on any `Custom Card`s:
+To set the card width (`1/3`, `1/2`, or `full` — defaults to `full`):
+
+```php
+...
+(new NovaGlobalFilter([
+    // Filters
+]))->width('1/2'),
+...
+```
+
+To listen to the `Global Filter` on any `Custom Card`s:
+
 ```js
 ...
 created() {
@@ -137,14 +156,16 @@ created() {
 ...
 ```
 
-To request all filter states from `Global Filter` on any `Custom Card`s:
+To request all filter states from the `Global Filter` on any `Custom Card`s:
+
 ```js
 ...
   Nova.$emit("global-filter-request");
 ...
 ```
 
-To request spesific filters state from `Global Filter` on any `Custom Card`s:
+To request specific filter states from the `Global Filter` on any `Custom Card`s:
+
 ```js
 ...
 created() {
@@ -156,7 +177,8 @@ created() {
 ...
 ```
 
-To receive filters state from `Global Filter` on any `Custom Card`s:
+To receive filter states from the `Global Filter` on any `Custom Card`s:
+
 ```js
 ...
 created() {
@@ -170,20 +192,26 @@ created() {
 
 ## Good to know
 
-- Basic functionality of this package is that it listens all the asigned filters. Once a value of a filter is changed, it emits as `Nova.$on('global-filter-changed', [changed filter and value])`. So any card that listens to this event will recieve the filter and its value.
-- This package overwrites Nova's default `Metric Card`s to allow them to listen `"global-filter-changed"` event. Make sure there are no any conflicts with other pacages.
-- This package currently does not support Index view filters to be synchronized. So filters in `Global Filter` will not trigger update at the filters in `Filter Menu` of your Index view.
-- `Reset` button simply reloads the current page. There is nothing fancy going on behind the scenes.
-- If you are willing to support this package, it will be great to get your issues, PRs and thoughts on [Github](https://github.com/nemrutco/). And dont forget to `Star` the package.
+- The basic functionality of this package is that it listens to all the assigned filters. Once the value of a filter is changed, it emits `Nova.$on('global-filter-changed', [changed filter and value])`. So any card that listens to this event will receive the filter and its value.
+- This package overwrites Nova's default `Metric Card`s to allow them to listen to the `"global-filter-changed"` event. Make sure there are no conflicts with other packages.
+- This package currently does not support Index view filters to be synchronized. So filters in the `Global Filter` will not trigger an update of the filters in the `Filter Menu` of your Index view.
+- The `Reset` button simply reloads the current page. There is nothing fancy going on behind the scenes.
 
-Cheers
+## Security Vulnerabilities
 
-Made with ❤️ for open source
+Please report security vulnerabilities by email rather than via the public issue tracker.
+
+## Credits
+
+This package is maintained by [Marshmallow](https://marshmallow.dev). It builds on the original work of:
+
 - [Nemrut Creative Studio](https://nemrut.co)
 - [Muzaffer Dede](https://github.com/muzafferdede)
 - [nemrutco/nova-global-filter](https://github.com/nemrutco/nova-global-filter)
-- [All Contributors](../../contributors)
+- [All Contributors](https://github.com/marshmallow-packages/nova-global-filter/contributors)
+
+Made with ❤️ for open source.
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see the [License File](LICENSE.md) for more information.
